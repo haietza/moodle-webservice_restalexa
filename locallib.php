@@ -122,7 +122,7 @@ class webservice_restjson_server extends webservice_base_server {
             $this->functionname = isset($methodvariables['wsfunction']) ? $methodvariables['wsfunction'] : null;
             unset($methodvariables['wsfunction']);
 
-            $this->parameters = $methodvariables;
+            $this->parameters = array('request' => json_encode($methodvariables));
         }
     }
 

@@ -80,21 +80,21 @@ class webservice_restjson_server extends webservice_base_server {
         $methodvariables = array_merge($_GET, (array) $data);
 
         // Check accept header for accepted responses.
-        if (isset($_SERVER["HTTP_ACCEPT"]) && $_SERVER['HTTP_ACCEPT'] != "*/*") {
-            $accept = array_map('trim', explode(',', $_SERVER["HTTP_ACCEPT"]));
-            if (!empty($accept)) {
-                if (!in_array('application/xml', $accept)) {
-                    if (in_array('application/json', $accept)) {
+        //if (isset($_SERVER["HTTP_ACCEPT"]) && $_SERVER['HTTP_ACCEPT'] != "*/*") {
+        //    $accept = array_map('trim', explode(',', $_SERVER["HTTP_ACCEPT"]));
+        //    if (!empty($accept)) {
+        //        if (!in_array('application/xml', $accept)) {
+        //            if (in_array('application/json', $accept)) {
                         $defaultrestformat = 'json';
-                    } else {
-                        http_response_code(406);
-                        throw new invalid_parameter_exception('No response types acceptable');
-                    }
-                } else if ($defaultrestformat == 'json' && !in_array('application/json', $accept)) {
-                    $defaultrestformat = 'xml';
-                }
-            }
-        }
+        //            } else {
+        //                http_response_code(406);
+        //                throw new invalid_parameter_exception('No response types acceptable');
+        //            }
+        //        } else if ($defaultrestformat == 'json' && !in_array('application/json', $accept)) {
+        //            $defaultrestformat = 'xml';
+        //        }
+        //    }
+        //}
 
         // Retrieve REST format parameter - 'xml' or 'json' if specified
         // where not set use same format as request for xml/json requests or xml for form data.
@@ -121,8 +121,16 @@ class webservice_restjson_server extends webservice_base_server {
 
             $this->functionname = isset($methodvariables['wsfunction']) ? $methodvariables['wsfunction'] : null;
             unset($methodvariables['wsfunction']);
-
-            $this->parameters = array('request' => json_encode($methodvariables));
+            
+            // Pass JSON request as array[request] => string
+            $request = array('request' => json_encode($methodvariables));
+            //$this->parameters = array('request' => json_encode($methodvariables));
+            $this->parameters = $request;
+            // get wstoken from JSON request
+            // This one is for when request is passed as parameter to URL web service call
+            // $request = json_decode($methodvariables['request'], true);
+            $json = json_decode($request['request'], true);
+            $this->token = $json['session']['user']['accessToken'];
         }
     }
 

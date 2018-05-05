@@ -65,7 +65,7 @@ class webservice_restjson_server extends webservice_base_server {
         // Check request content type and process appropriately.
         $defaultrestformat = 'xml';
         if (preg_match("#application/json#",$_SERVER["CONTENT_TYPE"])) {
-            $data = json_decode( file_get_contents('php://input'), true );
+            $data = json_decode(file_get_contents('php://input'), true );
             $defaultrestformat = 'json';
         } else if (preg_match("#application/xml#",$_SERVER["CONTENT_TYPE"])) {
             $data = simplexml_load_string( file_get_contents('php://input') );
@@ -123,7 +123,8 @@ class webservice_restjson_server extends webservice_base_server {
             unset($methodvariables['wsfunction']);
             
             // Pass JSON request as array[request] => string
-            $request = array('request' => json_encode($methodvariables));
+            //$request = array('request' => json_encode($methodvariables));
+            $request = array('request' => json_encode($data));
             //$this->parameters = array('request' => json_encode($methodvariables));
             $this->parameters = $request;
             // get wstoken from JSON request

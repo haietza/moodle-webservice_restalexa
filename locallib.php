@@ -75,8 +75,6 @@ class webservice_restjson_server extends webservice_base_server {
             $data = $_POST;
         }
 
-
-
         // Add GET parameters.
         $methodvariables = array_merge($_GET, (array) $data);
 
@@ -128,11 +126,13 @@ class webservice_restjson_server extends webservice_base_server {
             $request = array('request' => $jsonstr);
             //$this->parameters = array('request' => json_encode($methodvariables));
             $this->parameters = $request;
-            // get wstoken from JSON request
             // This one is for when request is passed as parameter to URL web service call
             // $request = json_decode($methodvariables['request'], true);
             $json = json_decode($request['request'], true);
-            $this->token = $json['session']['user']['accessToken'];
+            // get wstoken from JSON request
+            if ($json['session']['user']['accessToken']) {
+                $this->token = $json['session']['user']['accessToken'];
+            }
         }
     }
 

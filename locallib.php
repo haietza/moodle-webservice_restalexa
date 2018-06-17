@@ -131,8 +131,21 @@ class webservice_restjson_server extends webservice_base_server {
             $json = json_decode($request['request'], true);
             // get wstoken from JSON request
             if ($json['session']['user']['accessToken']) {
-                $this->token = $json['session']['user']['accessToken'];
-            }
+                try {
+                    $originaltoken = $this->token;
+                    $this->token = $json['session']['user']['accessToken'];
+                    $this->authenticate_user(); 
+                } catch (Exception $ex) {
+                    // Provided accessToken is invalid; pass web service user token to plugin for account linking request.
+                    $this->token = $originaltoken;
+                    // Have to edit $jsonstr here not $json - string gets passed to plugin
+                    unset($json['session']['user']['accessToken']);
+                    // Make sure this doesn't hose cert verification!!
+                    $jsonstr = json_encode($json);
+                    $request = array('request' => $jsonstr);
+                    $this->parameters = $request;
+                }
+            } 
         }
     }
 

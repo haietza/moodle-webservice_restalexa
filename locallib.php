@@ -63,58 +63,58 @@ class webservice_restjson_server extends webservice_base_server {
         parent::set_web_service_call_settings();
 
         // Check request content type and process appropriately.
-        $defaultrestformat = 'xml';
-        if (preg_match("#application/json#",$_SERVER["CONTENT_TYPE"])) {
+        //$defaultrestformat = 'xml';
+        //if (preg_match("#application/json#",$_SERVER["CONTENT_TYPE"])) {
             $jsonstr = file_get_contents('php://input');
             $data = json_decode(file_get_contents('php://input'), true );
             $defaultrestformat = 'json';
-        } else if (preg_match("#application/xml#",$_SERVER["CONTENT_TYPE"])) {
-            $data = simplexml_load_string(file_get_contents('php://input') );
-            $data = json_decode(json_encode($data), true ); // Convert objects to assoc arrays.
-        } else {
-            $data = $_POST;
-        }
+        //} else if (preg_match("#application/xml#",$_SERVER["CONTENT_TYPE"])) {
+            //$data = simplexml_load_string(file_get_contents('php://input') );
+            //$data = json_decode(json_encode($data), true ); // Convert objects to assoc arrays.
+        //} else {
+            //$data = $_POST;
+        //}
 
         // Add GET parameters.
         $methodvariables = array_merge($_GET, (array) $data);
 
         // Check accept header for accepted responses.
-        if (isset($_SERVER["HTTP_ACCEPT"]) && $_SERVER['HTTP_ACCEPT'] != "*/*") {
-            $accept = array_map('trim', explode(',', $_SERVER["HTTP_ACCEPT"]));
-            if (!empty($accept)) {
-                if (!in_array('application/xml', $accept)) {
-                    if (in_array('application/json', $accept)) {
-                        $defaultrestformat = 'json';
-                    } else {
-                        http_response_code(406);
-                        throw new invalid_parameter_exception('No response types acceptable');
-                    }
-                } else if ($defaultrestformat == 'json' && !in_array('application/json', $accept)) {
-                    $defaultrestformat = 'xml';
-                }
-            }
-        }
+        //if (isset($_SERVER["HTTP_ACCEPT"]) && $_SERVER['HTTP_ACCEPT'] != "*/*") {
+            //$accept = array_map('trim', explode(',', $_SERVER["HTTP_ACCEPT"]));
+            //if (!empty($accept)) {
+                //if (!in_array('application/xml', $accept)) {
+                    //if (in_array('application/json', $accept)) {
+                        //$defaultrestformat = 'json';
+                    //} else {
+                        //http_response_code(406);
+                        //throw new invalid_parameter_exception('No response types acceptable');
+                    //}
+                //} else if ($defaultrestformat == 'json' && !in_array('application/json', $accept)) {
+                    //$defaultrestformat = 'xml';
+                //}
+            //}
+        //}
 
         // Retrieve REST format parameter - 'xml' or 'json' if specified
         // where not set use same format as request for xml/json requests or xml for form data.
-        $restformatisset = isset($methodvariables['moodlewsrestformat'])
-                && (($methodvariables['moodlewsrestformat'] == 'xml' || $methodvariables['moodlewsrestformat'] == 'json'));
-        $this->restformat = $restformatisset ? $methodvariables['moodlewsrestformat'] : $defaultrestformat;
-        unset($methodvariables['moodlewsrestformat']);
+        //$restformatisset = isset($methodvariables['moodlewsrestformat'])
+                //&& (($methodvariables['moodlewsrestformat'] == 'xml' || $methodvariables['moodlewsrestformat'] == 'json'));
+        //$this->restformat = $restformatisset ? $methodvariables['moodlewsrestformat'] : $defaultrestformat;
+        //unset($methodvariables['moodlewsrestformat']);
 
-        if ($this->authmethod == WEBSERVICE_AUTHMETHOD_USERNAME) {
-            $this->username = isset($methodvariables['wsusername']) ? $methodvariables['wsusername'] : null;
-            unset($methodvariables['wsusername']);
+        //if ($this->authmethod == WEBSERVICE_AUTHMETHOD_USERNAME) {
+            //$this->username = isset($methodvariables['wsusername']) ? $methodvariables['wsusername'] : null;
+            //unset($methodvariables['wsusername']);
 
-            $this->password = isset($methodvariables['wspassword']) ? $methodvariables['wspassword'] : null;
-            unset($methodvariables['wspassword']);
+            //$this->password = isset($methodvariables['wspassword']) ? $methodvariables['wspassword'] : null;
+            //unset($methodvariables['wspassword']);
 
-            $this->functionname = isset($methodvariables['wsfunction']) ? $methodvariables['wsfunction'] : null;
-            unset($methodvariables['wsfunction']);
+            //$this->functionname = isset($methodvariables['wsfunction']) ? $methodvariables['wsfunction'] : null;
+            //unset($methodvariables['wsfunction']);
 
-            $this->parameters = $methodvariables;
+            //$this->parameters = $methodvariables;
 
-        } else {
+        //} else {
             $this->token = isset($methodvariables['wstoken']) ? $methodvariables['wstoken'] : null;
             unset($methodvariables['wstoken']);
 
@@ -123,30 +123,40 @@ class webservice_restjson_server extends webservice_base_server {
             
             // Pass JSON request as array[request] => string
             //$request = array('request' => json_encode($methodvariables));
-            $request = array('request' => $jsonstr);
+            //$request = array('request' => $jsonstr);
             //$this->parameters = array('request' => json_encode($methodvariables));
-            $this->parameters = $request;
+            //$this->parameters = $request;
             // This one is for when request is passed as parameter to URL web service call
             // $request = json_decode($methodvariables['request'], true);
-            $json = json_decode($request['request'], true);
+            //$json = json_decode($request['request'], true);
             // get wstoken from JSON request
-            if ($json['session']['user']['accessToken']) {
+            
+            // Check if user accessToken is in request.
+            if ($data['session']['user']['accessToken']) {
                 try {
-                    $originaltoken = $this->token;
-                    $this->token = $json['session']['user']['accessToken'];
+                    // Save web service user token passed in query string.
+                    $webserviceusertoken = $this->token;
+                    
+                    // Get user token from request.
+                    $this->token = $data['session']['user']['accessToken'];
+                    
+                    // Check if user token is valid.
                     $this->authenticate_user(); 
                 } catch (Exception $ex) {
-                    // Provided accessToken is invalid; pass web service user token to plugin for account linking request.
-                    $this->token = $originaltoken;
+                    // Provided user accessToken is invalid.
+                    // Pass web service user token to plugin for account linking request.
+                    $this->token = $webserviceusertoken;
+                    
                     // Have to edit $jsonstr here not $json - string gets passed to plugin
-                    unset($json['session']['user']['accessToken']);
+                    unset($data['session']['user']['accessToken']);
                     // Make sure this doesn't hose cert verification!!
-                    $jsonstr = json_encode($json);
-                    $request = array('request' => $jsonstr);
-                    $this->parameters = $request;
+                    $jsonstr = json_encode($data);
                 }
-            } 
-        }
+            }
+            
+            $request = array('request' => $jsonstr);
+            $this->parameters = $request;
+        //}
     }
 
     /**

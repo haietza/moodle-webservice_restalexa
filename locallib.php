@@ -156,7 +156,7 @@ class webservice_restjson_server extends webservice_base_server {
                     //$jsonstr = json_encode($data);
                 }
             }
-            
+            $request = array('request' => $jsonstr);
             $this->parameters = $request;
         //}
     }

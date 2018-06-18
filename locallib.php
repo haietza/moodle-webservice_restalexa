@@ -141,20 +141,22 @@ class webservice_restjson_server extends webservice_base_server {
                     $this->token = $data['session']['user']['accessToken'];
                     
                     // Check if user token is valid.
-                    $this->authenticate_user(); 
+                    $this->authenticate_user();
+                    $request = array('request' => $jsonstr, 'token' => 'valid');
                 } catch (Exception $ex) {
                     // Provided user accessToken is invalid.
                     // Pass web service user token to plugin for account linking request.
                     $this->token = $webserviceusertoken;
+                    $request = array('request' => $jsonstr, 'token' => 'invalid');
                     
+                    // Can't unset $data because then cert won't validate.
                     // Have to edit $jsonstr here not $json - string gets passed to plugin
-                    unset($data['session']['user']['accessToken']);
+                    //unset($data['session']['user']['accessToken']);
                     // Make sure this doesn't hose cert verification!!
-                    $jsonstr = json_encode($data);
+                    //$jsonstr = json_encode($data);
                 }
             }
             
-            $request = array('request' => $jsonstr);
             $this->parameters = $request;
         //}
     }

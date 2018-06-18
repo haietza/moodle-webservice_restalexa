@@ -100,6 +100,7 @@ class webservice_restjson_server extends webservice_base_server {
         //$restformatisset = isset($methodvariables['moodlewsrestformat'])
                 //&& (($methodvariables['moodlewsrestformat'] == 'xml' || $methodvariables['moodlewsrestformat'] == 'json'));
         //$this->restformat = $restformatisset ? $methodvariables['moodlewsrestformat'] : $defaultrestformat;
+        $this->restformat = $defaultrestformat;
         //unset($methodvariables['moodlewsrestformat']);
 
         //if ($this->authmethod == WEBSERVICE_AUTHMETHOD_USERNAME) {
@@ -131,6 +132,8 @@ class webservice_restjson_server extends webservice_base_server {
             //$json = json_decode($request['request'], true);
             // get wstoken from JSON request
             
+            $request = array('request' => $jsonstr);
+            
             // Check if user accessToken is in request.
             if ($data['session']['user']['accessToken']) {
                 try {
@@ -142,12 +145,11 @@ class webservice_restjson_server extends webservice_base_server {
                     
                     // Check if user token is valid.
                     $this->authenticate_user();
-                    $request = array('request' => $jsonstr, 'token' => 'valid');
+                    $request['token'] = 'valid';
                 } catch (Exception $ex) {
                     // Provided user accessToken is invalid.
                     // Pass web service user token to plugin for account linking request.
                     $this->token = $webserviceusertoken;
-                    $request = array('request' => $jsonstr, 'token' => 'invalid');
                     
                     // Can't unset $data because then cert won't validate.
                     // Have to edit $jsonstr here not $json - string gets passed to plugin
@@ -156,7 +158,7 @@ class webservice_restjson_server extends webservice_base_server {
                     //$jsonstr = json_encode($data);
                 }
             }
-            $request = array('request' => $jsonstr);
+            
             $this->parameters = $request;
         //}
     }
@@ -241,12 +243,12 @@ class webservice_restjson_server extends webservice_base_server {
      * Internal implementation - sending of page headers.
      */
     protected function send_headers() {
-        if ($this->restformat == 'json') {
+        //if ($this->restformat == 'json') {
             header('Content-type: application/json');
-        } else {
-            header('Content-Type: application/xml; charset=utf-8');
-            header('Content-Disposition: inline; filename="response.xml"');
-        }
+        //} else {
+            //header('Content-Type: application/xml; charset=utf-8');
+            //header('Content-Disposition: inline; filename="response.xml"');
+        //}
         header('Cache-Control: private, must-revalidate, pre-check=0, post-check=0, max-age=0');
         header('Expires: '. gmdate('D, d M Y H:i:s', 0) .' GMT');
         header('Pragma: no-cache');

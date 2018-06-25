@@ -135,13 +135,13 @@ class webservice_restjson_server extends webservice_base_server {
             $request = array('request' => $jsonstr);
             
             // Check if user accessToken is in request.
-            if ($data['session']['user']['accessToken']) {
+            if ($data['context']['System']['user']['accessToken']) {
                 try {
                     // Save web service user token passed in query string.
                     $webserviceusertoken = $this->token;
                     
                     // Get user token from request.
-                    $this->token = $data['session']['user']['accessToken'];
+                    $this->token = $data['context']['System']['user']['accessToken'];
                     
                     // Check if user token is valid.
                     $this->authenticate_user();

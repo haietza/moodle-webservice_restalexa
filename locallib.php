@@ -132,7 +132,7 @@ class webservice_restjson_server extends webservice_base_server {
             //$json = json_decode($request['request'], true);
             // get wstoken from JSON request
             
-            $request = array('request' => $jsonstr);
+            $request = array('request' => $jsonstr, 'token' => '');
             
             // Check if user accessToken is in request.
             if ($data['context']['System']['user']['accessToken']) {

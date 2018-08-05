@@ -23,10 +23,12 @@
  * Forked and modified from webservice_restjson
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 $capabilities = array(
     'webservice/restalexa:use' => array(
-        'captype' => 'read', // in fact this may be considered read and write at the same time
-        'contextlevel' => CONTEXT_COURSE, // the context level should be probably CONTEXT_MODULE
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
         ),
     ),

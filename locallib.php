@@ -23,6 +23,7 @@
  * Forked and modified from webservice_restjson
  */
 
+defined('MOODLE_INTERNAL') || die();
 require_once("$CFG->dirroot/webservice/lib.php");
 
 /**
@@ -115,7 +116,7 @@ class webservice_restalexa_server extends webservice_base_server {
         }
 
         if (!empty($exception)) {
-            $response =  $this->generate_error($exception);
+            $response = $this->generate_error($exception);
         } else {
             // We can now convert the response to the requested REST format.
             $response = json_encode($validatedvalues);
@@ -180,7 +181,7 @@ class webservice_restalexa_server extends webservice_base_server {
             return '';
         } else if ($desc instanceof external_value) {
             if (is_bool($returns)) {
-                // we want 1/0 instead of true/false here
+                // We want 1/0 instead of true/false here.
                 $returns = (int)$returns;
             }
             if (is_null($returns)) {
@@ -199,7 +200,7 @@ class webservice_restalexa_server extends webservice_base_server {
             return $mult;
         } else if ($desc instanceof external_single_structure) {
             $single = '<SINGLE>'."\n";
-            foreach ($desc->keys as $key=>$subdesc) {
+            foreach ($desc->keys as $key => $subdesc) {
                 $single .= '<KEY name="'.$key.'">'.self::xmlize_result($returns[$key], $subdesc).'</KEY>'."\n";
             }
             $single .= '</SINGLE>'."\n";

@@ -19,13 +19,13 @@
  * @author    Michelle Melton <meltonml@appstate.edu>
  * @copyright 2018, Michelle Melton
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * 
+ *
  * Forked and modified from webservice_restjson
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018080500;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2017111304;        // Requires this Moodle version
-$plugin->component = 'webservice_restalexa'; // Full name of the plugin (used for diagnostics)
+$plugin->version   = 2018080500;
+$plugin->requires  = 2017111304;
+$plugin->component = 'webservice_restalexa';
 $plugin->release   = '0.0.1';

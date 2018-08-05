@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * REST web service implementation classes and methods.
+ * @package   webservice_restalexa
+ * @author    Michelle Melton <meltonml@appstate.edu>
+ * @copyright 2018, Michelle Melton
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @package    webservice_restjson
- * @copyright  2009 Jerome Mouneyrac, 2016 Owen Barritt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Forked and modified from webservice_restjson
  */
 
 require_once("$CFG->dirroot/webservice/lib.php");
@@ -32,7 +32,7 @@ require_once("$CFG->dirroot/webservice/lib.php");
  * @copyright  2009 Petr Skoda (skodak)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class webservice_restjson_server extends webservice_base_server {
+class webservice_restalexa_server extends webservice_base_server {
 
     /** @var string return method ('xml' or 'json') */
     protected $restformat;
@@ -45,122 +45,57 @@ class webservice_restjson_server extends webservice_base_server {
      */
     public function __construct($authmethod) {
         parent::__construct($authmethod);
-        $this->wsname = 'restjson';
+        $this->wsname = 'restalexa';
     }
 
     /**
-     * This method parses the $_POST and $_GET superglobals and looks for
-     * the following information:
-     *  1/ user authentication - username+password or token (wsusername, wspassword and wstoken parameters)
-     *  2/ function name (wsfunction parameter)
-     *  3/ function parameters (all other parameters except those above)
-     *  4/ text format parameters
-     *  5/ return rest format xml/json
+     * This method parses the php input for the JSON request, web service token, and web service function.
      */
     protected function parse_request() {
-
         // Retrieve and clean the POST/GET parameters from the parameters specific to the server.
         parent::set_web_service_call_settings();
 
-        // Check request content type and process appropriately.
-        //$defaultrestformat = 'xml';
-        //if (preg_match("#application/json#",$_SERVER["CONTENT_TYPE"])) {
-            $jsonstr = file_get_contents('php://input');
-            $data = json_decode(file_get_contents('php://input'), true );
-            $defaultrestformat = 'json';
-        //} else if (preg_match("#application/xml#",$_SERVER["CONTENT_TYPE"])) {
-            //$data = simplexml_load_string(file_get_contents('php://input') );
-            //$data = json_decode(json_encode($data), true ); // Convert objects to assoc arrays.
-        //} else {
-            //$data = $_POST;
-        //}
+        // Get JSON request as string and object for processing.
+        $datastring = file_get_contents('php://input');
+        $data = json_decode(file_get_contents('php://input'), true );
 
         // Add GET parameters.
         $methodvariables = array_merge($_GET, (array) $data);
 
-        // Check accept header for accepted responses.
-        //if (isset($_SERVER["HTTP_ACCEPT"]) && $_SERVER['HTTP_ACCEPT'] != "*/*") {
-            //$accept = array_map('trim', explode(',', $_SERVER["HTTP_ACCEPT"]));
-            //if (!empty($accept)) {
-                //if (!in_array('application/xml', $accept)) {
-                    //if (in_array('application/json', $accept)) {
-                        //$defaultrestformat = 'json';
-                    //} else {
-                        //http_response_code(406);
-                        //throw new invalid_parameter_exception('No response types acceptable');
-                    //}
-                //} else if ($defaultrestformat == 'json' && !in_array('application/json', $accept)) {
-                    //$defaultrestformat = 'xml';
-                //}
-            //}
-        //}
+        // Set REST format to JSON.
+        $this->restformat = 'json';
 
-        // Retrieve REST format parameter - 'xml' or 'json' if specified
-        // where not set use same format as request for xml/json requests or xml for form data.
-        //$restformatisset = isset($methodvariables['moodlewsrestformat'])
-                //&& (($methodvariables['moodlewsrestformat'] == 'xml' || $methodvariables['moodlewsrestformat'] == 'json'));
-        //$this->restformat = $restformatisset ? $methodvariables['moodlewsrestformat'] : $defaultrestformat;
-        $this->restformat = $defaultrestformat;
-        //unset($methodvariables['moodlewsrestformat']);
+        // Set token to query string argument.
+        $this->token = isset($methodvariables['wstoken']) ? $methodvariables['wstoken'] : null;
+        unset($methodvariables['wstoken']);
 
-        //if ($this->authmethod == WEBSERVICE_AUTHMETHOD_USERNAME) {
-            //$this->username = isset($methodvariables['wsusername']) ? $methodvariables['wsusername'] : null;
-            //unset($methodvariables['wsusername']);
+        // Set web service function to query string argument.
+        $this->functionname = isset($methodvariables['wsfunction']) ? $methodvariables['wsfunction'] : null;
+        unset($methodvariables['wsfunction']);
 
-            //$this->password = isset($methodvariables['wspassword']) ? $methodvariables['wspassword'] : null;
-            //unset($methodvariables['wspassword']);
+        // Prepare request to send to web service.
+        $request = array('request' => $datastring, 'token' => '');
 
-            //$this->functionname = isset($methodvariables['wsfunction']) ? $methodvariables['wsfunction'] : null;
-            //unset($methodvariables['wsfunction']);
+        // Check if user accessToken is in request.
+        if ($data['context']['System']['user']['accessToken']) {
+            try {
+                // Save web service user token passed in query string.
+                $webserviceusertoken = $this->token;
 
-            //$this->parameters = $methodvariables;
+                // Get user token from request.
+                $this->token = $data['context']['System']['user']['accessToken'];
 
-        //} else {
-            $this->token = isset($methodvariables['wstoken']) ? $methodvariables['wstoken'] : null;
-            unset($methodvariables['wstoken']);
-
-            $this->functionname = isset($methodvariables['wsfunction']) ? $methodvariables['wsfunction'] : null;
-            unset($methodvariables['wsfunction']);
-            
-            // Pass JSON request as array[request] => string
-            //$request = array('request' => json_encode($methodvariables));
-            //$request = array('request' => $jsonstr);
-            //$this->parameters = array('request' => json_encode($methodvariables));
-            //$this->parameters = $request;
-            // This one is for when request is passed as parameter to URL web service call
-            // $request = json_decode($methodvariables['request'], true);
-            //$json = json_decode($request['request'], true);
-            // get wstoken from JSON request
-            
-            $request = array('request' => $jsonstr, 'token' => '');
-            
-            // Check if user accessToken is in request.
-            if ($data['context']['System']['user']['accessToken']) {
-                try {
-                    // Save web service user token passed in query string.
-                    $webserviceusertoken = $this->token;
-                    
-                    // Get user token from request.
-                    $this->token = $data['context']['System']['user']['accessToken'];
-                    
-                    // Check if user token is valid.
-                    $this->authenticate_user();
-                    $request['token'] = 'valid';
-                } catch (Exception $ex) {
-                    // Provided user accessToken is invalid.
-                    // Pass web service user token to plugin for account linking request.
-                    $this->token = $webserviceusertoken;
-                    
-                    // Can't unset $data because then cert won't validate.
-                    // Have to edit $jsonstr here not $json - string gets passed to plugin
-                    //unset($data['session']['user']['accessToken']);
-                    // Make sure this doesn't hose cert verification!!
-                    //$jsonstr = json_encode($data);
-                }
+                // Check if user token is valid.
+                $this->authenticate_user();
+                $request['token'] = 'valid';
+            } catch (Exception $ex) {
+                // Provided user accessToken is invalid.
+                // Pass web service user token to plugin for account linking request.
+                $this->token = $webserviceusertoken;
             }
-            
-            $this->parameters = $request;
-        //}
+        }
+
+        $this->parameters = $request;
     }
 
     /**
@@ -168,8 +103,7 @@ class webservice_restjson_server extends webservice_base_server {
      * formatted as XML document.
      */
     protected function send_response() {
-
-        //Check that the returned values are valid
+        // Check that the returned values are valid.
         try {
             if ($this->function->returns_desc != null) {
                 $validatedvalues = external_api::clean_returnvalue($this->function->returns_desc, $this->returns);
@@ -183,15 +117,8 @@ class webservice_restjson_server extends webservice_base_server {
         if (!empty($exception)) {
             $response =  $this->generate_error($exception);
         } else {
-            //We can now convert the response to the requested REST format
-            if ($this->restformat == 'json') {
-                $response = json_encode($validatedvalues);
-            } else {
-                $response = '<?xml version="1.0" encoding="UTF-8" ?>'."\n";
-                $response .= '<RESPONSE>'."\n";
-                $response .= self::xmlize_result($validatedvalues, $this->function->returns_desc);
-                $response .= '</RESPONSE>'."\n";
-            }
+            // We can now convert the response to the requested REST format.
+            $response = json_encode($validatedvalues);
         }
 
         $this->send_headers();
@@ -216,26 +143,14 @@ class webservice_restjson_server extends webservice_base_server {
      * @return string the error in the requested REST format
      */
     protected function generate_error($ex) {
-        if ($this->restformat == 'json') {
-            $errorobject = new stdClass;
-            $errorobject->exception = get_class($ex);
-            $errorobject->errorcode = $ex->errorcode;
-            $errorobject->message = $ex->getMessage();
-            if (debugging() and isset($ex->debuginfo)) {
-                $errorobject->debuginfo = $ex->debuginfo;
-            }
-            $error = json_encode($errorobject);
-        } else {
-            $error = '<?xml version="1.0" encoding="UTF-8" ?>'."\n";
-            $error .= '<EXCEPTION class="'.get_class($ex).'">'."\n";
-            $error .= '<ERRORCODE>' . htmlspecialchars($ex->errorcode, ENT_COMPAT, 'UTF-8')
-                    . '</ERRORCODE>' . "\n";
-            $error .= '<MESSAGE>'.htmlspecialchars($ex->getMessage(), ENT_COMPAT, 'UTF-8').'</MESSAGE>'."\n";
-            if (debugging() and isset($ex->debuginfo)) {
-                $error .= '<DEBUGINFO>'.htmlspecialchars($ex->debuginfo, ENT_COMPAT, 'UTF-8').'</DEBUGINFO>'."\n";
-            }
-            $error .= '</EXCEPTION>'."\n";
+        $errorobject = new stdClass;
+        $errorobject->exception = get_class($ex);
+        $errorobject->errorcode = $ex->errorcode;
+        $errorobject->message = $ex->getMessage();
+        if (debugging() and isset($ex->debuginfo)) {
+            $errorobject->debuginfo = $ex->debuginfo;
         }
+        $error = json_encode($errorobject);
         return $error;
     }
 
@@ -243,12 +158,7 @@ class webservice_restjson_server extends webservice_base_server {
      * Internal implementation - sending of page headers.
      */
     protected function send_headers() {
-        //if ($this->restformat == 'json') {
-            header('Content-type: application/json');
-        //} else {
-            //header('Content-Type: application/xml; charset=utf-8');
-            //header('Content-Disposition: inline; filename="response.xml"');
-        //}
+        header('Content-type: application/json');
         header('Cache-Control: private, must-revalidate, pre-check=0, post-check=0, max-age=0');
         header('Expires: '. gmdate('D, d M Y H:i:s', 0) .' GMT');
         header('Pragma: no-cache');
@@ -268,7 +178,6 @@ class webservice_restjson_server extends webservice_base_server {
     protected static function xmlize_result($returns, $desc) {
         if ($desc === null) {
             return '';
-
         } else if ($desc instanceof external_value) {
             if (is_bool($returns)) {
                 // we want 1/0 instead of true/false here
@@ -279,7 +188,6 @@ class webservice_restjson_server extends webservice_base_server {
             } else {
                 return '<VALUE>'.htmlspecialchars($returns, ENT_COMPAT, 'UTF-8').'</VALUE>'."\n";
             }
-
         } else if ($desc instanceof external_multiple_structure) {
             $mult = '<MULTIPLE>'."\n";
             if (!empty($returns)) {
@@ -289,7 +197,6 @@ class webservice_restjson_server extends webservice_base_server {
             }
             $mult .= '</MULTIPLE>'."\n";
             return $mult;
-
         } else if ($desc instanceof external_single_structure) {
             $single = '<SINGLE>'."\n";
             foreach ($desc->keys as $key=>$subdesc) {
@@ -298,38 +205,5 @@ class webservice_restjson_server extends webservice_base_server {
             $single .= '</SINGLE>'."\n";
             return $single;
         }
-    }
-}
-
-
-/**
- * RESTJSON test client class
- *
- * @package    webservice_restjson
- * @copyright  2016 Owen Barritt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class webservice_restjson_test_client implements webservice_test_client_interface {
-    /**
-     * Execute test client WS request
-     * @param string $serverurl server url (including token parameter or username/password parameters)
-     * @param string $function function name
-     * @param array $params parameters of the called function
-     * @return mixed
-     */
-    public function simpletest($serverurl, $function, $params) {
-        // Setup cURL
-        $ch = curl_init($serverurl.'&wsfunction='.$function);
-        curl_setopt_array($ch, array(
-            CURLOPT_POST => TRUE,
-            CURLOPT_RETURNTRANSFER => TRUE,
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json'
-            ),
-            CURLOPT_POSTFIELDS => json_encode($params)
-        ));
-
-        // Send the request
-        return curl_exec($ch);
     }
 }

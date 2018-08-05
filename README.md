@@ -1,13 +1,13 @@
-moodle-webservice_restjson
+moodle-webservice_restalexa
 ================================
 
-REST webservice protocol based on the standard core REST webservice, but with added support for JSON & XML payloads
-and supports using HTTP ACCEPTS headers for determining response format.
+REST webservice protocol based on the standard core REST webservice, but with added support for JSON payloads
+and supports the local_alexakill plugin for Amazon Alexa skill integration with Moodle.
 
 Installation
 ------------
 
-Simply place the filter files in ./webservice/restjson
+Simply place the filter files in ./webservice/restalexa
 
 Setup
 -----

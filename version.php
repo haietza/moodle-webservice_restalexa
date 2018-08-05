@@ -14,18 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * Version details
- *
- * @package    webservice_restjson
- * @copyright  2009 Jerome Mouneyrac, 2016 Owen Barritt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   webservice_restalexa
+ * @author    Michelle Melton <meltonml@appstate.edu>
+ * @copyright 2018, Michelle Melton
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * 
+ * Forked and modified from webservice_restjson
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018040900;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2015050500;        // Requires this Moodle version
-$plugin->component = 'webservice_restjson'; // Full name of the plugin (used for diagnostics)
-$plugin->release   = '0.4 for Moodle 2.9+';
+$plugin->version   = 2018080500;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2017111304;        // Requires this Moodle version
+$plugin->component = 'webservice_restalexa'; // Full name of the plugin (used for diagnostics)
+$plugin->release   = '0.0.1';

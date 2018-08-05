@@ -14,15 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * Strings for component 'webservice_rest', language 'en', branch 'MOODLE_20_STABLE'
+ * @package   webservice_restalexa
+ * @author    Michelle Melton <meltonml@appstate.edu>
+ * @copyright 2018, Michelle Melton
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @package    webservice_rest
- * @category   string
- * @copyright  2009 Petr Skodak, 2016 Owen Barritt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Forked and modified from webservice_restjson
  */
 
-$string['pluginname'] = 'REST protocol (with JSON/XML input support)';
-$string['restjson:use'] = 'Use REST protocol (with JSON/XML input support)';
+$string['pluginname'] = 'REST protocol for Amazon Alexa (with JSON input support)';
+$string['restalexa:use'] = 'Use REST protocol for Amazon Alexa (with JSON input support)';

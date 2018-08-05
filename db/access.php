@@ -14,23 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * REST server related capabilities
+ * @package   webservice_restalexa
+ * @author    Michelle Melton <meltonml@appstate.edu>
+ * @copyright 2018, Michelle Melton
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @package    webservice_rest
- * @category   access
- * @copyright  2009 Petr Skodak, 2016 Owen Barritt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Forked and modified from webservice_restjson
  */
 
 $capabilities = array(
-
-    'webservice/restjson:use' => array(
+    'webservice/restalexa:use' => array(
         'captype' => 'read', // in fact this may be considered read and write at the same time
         'contextlevel' => CONTEXT_COURSE, // the context level should be probably CONTEXT_MODULE
         'archetypes' => array(
         ),
     ),
-
 );

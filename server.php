@@ -14,33 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * REST web service entry point. The authentication is done via tokens.
+ * @package   webservice_restalexa
+ * @author    Michelle Melton <meltonml@appstate.edu>
+ * @copyright 2018, Michelle Melton
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
- * @package    webservice_restjson
- * @copyright  2009 Jerome Mouneyrac, 2016 Owen Barritt
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Forked and modified from webservice_restjson
  */
 
 /**
  * NO_DEBUG_DISPLAY - disable moodle specific debug messages and any errors in output
  */
 define('NO_DEBUG_DISPLAY', true);
-
 define('WS_SERVER', true);
 
 require('../../config.php');
-require_once("$CFG->dirroot/webservice/restjson/locallib.php");
+require_once("$CFG->dirroot/webservice/restalexa/locallib.php");
 
-if (!webservice_protocol_is_enabled('restjson')) {
+if (!webservice_protocol_is_enabled('restalexa')) {
     header("HTTP/1.0 403 Forbidden");
     debugging('The server died because the web services or the REST protocol are not enable',
         DEBUG_DEVELOPER);
     die;
 }
 
-$server = new webservice_restjson_server(WEBSERVICE_AUTHMETHOD_PERMANENT_TOKEN);
+$server = new webservice_restalexa_server(WEBSERVICE_AUTHMETHOD_PERMANENT_TOKEN);
 $server->run();
 die;
-

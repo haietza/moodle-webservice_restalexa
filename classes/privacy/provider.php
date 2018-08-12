@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Privacy provider implementation for webservice_restalexa.
+ * 
  * @package   webservice_restalexa
  * @author    Michelle Melton <meltonml@appstate.edu>
  * @copyright 2018, Michelle Melton
@@ -23,6 +25,24 @@
  * Forked and modified from webservice_restjson
  */
 
-$string['pluginname'] = 'REST protocol for Amazon Alexa (with JSON input support)';
-$string['restalexa:use'] = 'Use REST protocol for Amazon Alexa (with JSON input support)';
-$string['privacy:metadata'] = 'The REST protocol for Amazon Alexa plugin does not store any personal data.';
+namespace webservice_restalexa\privacy;
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Privacy provider implementation for webservice_restalexa.
+ *
+ * @copyright 2018, Michelle Melton
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}

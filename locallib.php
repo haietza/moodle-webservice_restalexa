@@ -29,8 +29,8 @@ require_once("$CFG->dirroot/webservice/lib.php");
 /**
  * REST service server implementation.
  *
- * @package    webservice_rest
- * @copyright  2009 Petr Skoda (skodak)
+ * @package    webservice_restalexa
+ * @copyright 2018, Michelle Melton
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class webservice_restalexa_server extends webservice_base_server {

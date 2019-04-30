@@ -2,7 +2,7 @@ moodle-webservice_restalexa
 ================================
 
 REST webservice protocol based on the standard core REST webservice, but with added support for JSON payloads
-and supports the local_alexakill plugin for Amazon Alexa skill integration with Moodle.
+and supports the local_alexakill plugin for Amazon Alexa skill integration with Moodle. Based on moodle-webservice_restjson plugin.
 
 Installation
 ------------
